@@ -16,36 +16,36 @@ class Movies {
 }
 
 class Movie {
-  bool? adult;
-  String? backdropPath;
-  List<int>? genreIds;
-  int? id;
-  String? originalLanguage;
-  String? originalTitle;
-  String? overview;
-  double? popularity;
-  String? posterPath;
-  String? releaseDate;
-  String? title;
-  bool? video;
-  double? voteAverage;
-  int? voteCount;
+  late bool adult;
+  late String backdropPath;
+  late List<int> genreIds;
+  late int id;
+  late String originalLanguage;
+  late String originalTitle;
+  late String overview;
+  late double popularity;
+  late String posterPath;
+  late String releaseDate;
+  late String title;
+  late bool video;
+  late double voteAverage;
+  late int voteCount;
 
   Movie({
-    this.adult,
-    this.backdropPath,
-    this.genreIds,
-    this.id,
-    this.originalLanguage,
-    this.originalTitle,
-    this.overview,
-    this.popularity,
-    this.posterPath,
-    this.releaseDate,
-    this.title,
-    this.video,
-    this.voteAverage,
-    this.voteCount,
+    required this.adult,
+    required this.backdropPath,
+    required this.genreIds,
+    required this.id,
+    required this.originalLanguage,
+    required this.originalTitle,
+    required this.overview,
+    required this.popularity,
+    required this.posterPath,
+    required this.releaseDate,
+    required this.title,
+    required this.video,
+    required this.voteAverage,
+    required this.voteCount,
   });
 
   Movie.fromJsonMap(Map<String, dynamic> json) {
@@ -65,23 +65,17 @@ class Movie {
     voteCount = json['vote_count'];
   }
 
-  // Widget getPoster() {
-  //   if (posterPath == null) {
-  //     return Image(image: AssetImage('assets/no-image.png'));
-  //   } else {
-  //     return FadeInImage(
-  //         placeholder: AssetImage('assets/no-image.png'),
-  //         image: NetworkImage(
-  //           'https://image.tmdb.org/t/p/w500/$posterPath',
-  //         ));
-
-  //   }
-  // }
-
   String getPoster() {
     if (posterPath == null) {
       return 'https://therockstore.com.ar/wp-content/uploads/2021/06/noImg-24.png';
     }
     return 'https://image.tmdb.org/t/p/w500/$posterPath';
+  }
+
+  String getBackdropPath() {
+    if (backdropPath == null) {
+      return 'https://therockstore.com.ar/wp-content/uploads/2021/06/noImg-24.png';
+    }
+    return 'https://image.tmdb.org/t/p/w500/$backdropPath';
   }
 }
