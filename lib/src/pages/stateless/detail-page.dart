@@ -34,9 +34,14 @@ class DetailPage extends StatelessWidget {
       pinned: true,
       flexibleSpace: FlexibleSpaceBar(
         centerTitle: true,
-        title: Text(
-          movie!.title,
-          style: TextStyle(color: Colors.white, fontSize: 16.0),
+        title: Container(
+          width: double.infinity,
+          alignment: Alignment.bottomCenter,
+          color: Colors.black12,
+          child: Text(
+            movie!.title,
+            style: TextStyle(color: Colors.white, fontSize: 16.0),
+          ),
         ),
         background: FadeInImage(
           image: NetworkImage(movie.getBackdropPath()),
@@ -135,15 +140,16 @@ class DetailPage extends StatelessWidget {
           itemCount: actors!.length,
           itemBuilder: (context, index) {
             return Container(
+              // margin: EdgeInsets.symmetric(horizontal: 10.0),
               child: Column(
                 children: <Widget>[
                   ClipRRect(
                     borderRadius: BorderRadius.circular(20.0),
                     child: FadeInImage(
-                      placeholder: AssetImage('assets/no-imge.png'),
+                      placeholder: AssetImage('assets/no-image.png'),
                       image: NetworkImage(actors[index].getProfileImage()),
-                      height: 150.0,
                       fit: BoxFit.cover,
+                      height: 140,
                     ),
                   ),
                   SizedBox(
@@ -153,7 +159,7 @@ class DetailPage extends StatelessWidget {
                     actors[index].originalName,
                     style: Theme.of(context).textTheme.subtitle1,
                     overflow: TextOverflow.ellipsis,
-                  )
+                  ),
                 ],
               ),
             );

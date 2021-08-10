@@ -67,14 +67,14 @@ class Movie {
 
   String getPoster() {
     if (posterPath == null) {
-      return 'https://therockstore.com.ar/wp-content/uploads/2021/06/noImg-24.png';
+      return 'https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png';
     }
     return 'https://image.tmdb.org/t/p/w500/$posterPath';
   }
 
   String getBackdropPath() {
     if (backdropPath == null) {
-      return 'https://therockstore.com.ar/wp-content/uploads/2021/06/noImg-24.png';
+      return 'https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png';
     }
     return 'https://image.tmdb.org/t/p/w500/$backdropPath';
   }
