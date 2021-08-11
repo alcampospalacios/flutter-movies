@@ -1,6 +1,5 @@
-import 'package:films/src/models/actors-model.dart';
-import 'package:films/src/models/movies-model.dart';
-import 'package:films/src/providers/movies-provider.dart';
+import 'package:films/src/models/movie.dart';
+import 'package:films/src/widgets/cast-card-widget.dart';
 import 'package:flutter/material.dart';
 
 class DetailPage extends StatelessWidget {
@@ -15,11 +14,11 @@ class DetailPage extends StatelessWidget {
         SliverList(
             delegate: SliverChildListDelegate(<Widget>[
           SizedBox(
-            height: 5.0,
+            height: 10.0,
           ),
           _posterTitle(context, _movie),
           _description(_movie),
-          _createCast(_movie)
+          CastWidget(idMovie: _movie!.id)
         ]))
       ],
     ));
@@ -34,13 +33,21 @@ class DetailPage extends StatelessWidget {
       pinned: true,
       flexibleSpace: FlexibleSpaceBar(
         centerTitle: true,
+        titlePadding: EdgeInsets.all(0),
         title: Container(
           width: double.infinity,
           alignment: Alignment.bottomCenter,
           color: Colors.black12,
-          child: Text(
-            movie!.title,
-            style: TextStyle(color: Colors.white, fontSize: 16.0),
+          child: Container(
+            margin: EdgeInsets.only(bottom: 15.0),
+            child: Text(
+              movie!.title,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16.0,
+              ),
+            ),
           ),
         ),
         background: FadeInImage(
@@ -76,12 +83,12 @@ class DetailPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                movie.title,
-                style: Theme.of(context).textTheme.headline6,
+                movie.originalTitle,
+                style: Theme.of(context).textTheme.headline5,
                 overflow: TextOverflow.ellipsis,
               ),
               Text(
-                movie.originalTitle,
+                'Fecha de estreno: ${movie.releaseDate}',
                 style: Theme.of(context).textTheme.subtitle1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -94,7 +101,7 @@ class DetailPage extends StatelessWidget {
                   SizedBox(
                     width: 5.0,
                   ),
-                  Text('${movie.voteAverage}/${movie.voteCount}',
+                  Text('${movie.voteAverage}/10 de ${movie.voteCount}',
                       style: Theme.of(context).textTheme.subtitle1)
                 ],
               )
@@ -112,58 +119,6 @@ class DetailPage extends StatelessWidget {
         movie!.overview,
         textAlign: TextAlign.justify,
       ),
-    );
-  }
-
-  Widget _createCast(Movie? movie) {
-    final movieProvider = new MoviesProvider();
-
-    return FutureBuilder(
-      future: movieProvider.getCast(movie!.id.toString()),
-      builder: (context, AsyncSnapshot<List<Actor>> snapshot) {
-        if (snapshot.hasData) {
-          return _createActorsPageView(context, snapshot.data);
-        } else {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-      },
-    );
-  }
-
-  Widget _createActorsPageView(BuildContext context, List<Actor>? actors) {
-    return SizedBox(
-      height: 200.0,
-      child: PageView.builder(
-          controller: PageController(initialPage: 1, viewportFraction: 0.3),
-          itemCount: actors!.length,
-          itemBuilder: (context, index) {
-            return Container(
-              // margin: EdgeInsets.symmetric(horizontal: 10.0),
-              child: Column(
-                children: <Widget>[
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(20.0),
-                    child: FadeInImage(
-                      placeholder: AssetImage('assets/no-image.png'),
-                      image: NetworkImage(actors[index].getProfileImage()),
-                      fit: BoxFit.cover,
-                      height: 140,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 5.0,
-                  ),
-                  Text(
-                    actors[index].originalName,
-                    style: Theme.of(context).textTheme.subtitle1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            );
-          }),
     );
   }
 }

@@ -1,74 +1,64 @@
 import 'dart:async';
-import 'dart:convert';
-import 'package:films/src/models/actors-model.dart';
+import 'package:films/src/models/credits_response.dart';
+import 'package:films/src/models/movie.dart';
+import 'package:films/src/models/now_playing_response.dart';
+import 'package:films/src/models/popular_response.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:films/src/models/movies-model.dart';
-
-class MoviesProvider {
-  // request data
+class MoviesProvider extends ChangeNotifier {
+  // // request data
   String _apiKey = 'f222162fa537c6b651ecfc1f02a53e2d';
   String _url = 'api.themoviedb.org';
   String _languaje = 'es-ES';
   int _page = 0;
 
-  bool _loading = false;
+  List<Movie> onDisplayMovies = [];
+  List<Movie> onDisplayPopular = [];
+  Map<int, List<Cast>> cast = {};
 
-  // handling the list
-  List<Movie> _popular = [];
-
-  // Dlecaring stream controller, something like observables
-  final _streamController = StreamController<List<Movie>>.broadcast();
-
-  // getters and setters stream controller
-  Function(List<Movie>) get controllerSink => _streamController.sink.add;
-  Stream<List<Movie>> get controllerStream => _streamController.stream;
-
-  // destroying the stream controllers
-  void disposeStream() {
-    _streamController.close();
+  MoviesProvider() {
+    this.getMoviesNowPlaying();
+    this.getPopular();
   }
 
-  Future<List<Movie>> _request(Uri url) async {
+  Future<String> _request(String endpoint, [int page = 1]) async {
+    final url = Uri.https(_url, endpoint,
+        {'api_key': _apiKey, 'language': _languaje, 'page': '$page'});
+
+    // awaiting by the http response
     final response = await http.get(url);
-    final decodeData = json.decode(response.body);
-
-    final movies = new Movies.fromJsonList(decodeData['results']);
-    return movies.listOfMovies;
+    return response.body;
   }
 
-  Future<List<Movie>> getNowPlaying() async {
-    final url = Uri.https(_url, '3/movie/now_playing',
-        {'api_key': _apiKey, 'language': _languaje, 'page': '1'});
+  getMoviesNowPlaying() async {
+    final response = await this._request('3/movie/now_playing');
+    final nowPlayingRes = NowPlayingResponse.fromJson(response);
 
-    return await _request(url);
+    this.onDisplayMovies = nowPlayingRes.results;
+    notifyListeners();
   }
 
-  Future<List<Movie>> getPopularMovie() async {
-    if (_loading) return [];
-    _loading = true;
+  getPopular() async {
+    this._page++;
 
-    _page++;
-    final url = Uri.https(_url, '3/movie/popular',
-        {'api_key': _apiKey, 'language': _languaje, 'page': _page.toString()});
+    final response = await this._request('3/movie/popular', this._page);
+    final popularResponse = PopularResponse.fromJson(response);
 
-    final response = await _request(url);
-    _popular.addAll(response);
-
-    controllerSink(_popular);
-
-    _loading = false;
-    return response;
+    this.onDisplayPopular = [
+      ...this.onDisplayPopular,
+      ...popularResponse.results
+    ];
+    notifyListeners();
   }
 
-  Future<List<Actor>> getCast(String idMovie) async {
-    final url = Uri.https(_url, '3/movie/$idMovie/credits',
-        {'api_key': _apiKey, 'language': _languaje});
+  Future<List<Cast>> getCast(int idMovie) async {
+    if (this.cast.containsKey(idMovie)) return this.cast[idMovie]!;
 
-    final response = await http.get(url);
-    final decodeData = json.decode(response.body);
+    final response = await this._request('3/movie/$idMovie/credits');
+    final crediResponse = CreditResponse.fromJson(response);
 
-    final actors = new Actors.fromJsonList(decodeData['cast']);
-    return actors.listOfActors;
+    this.cast[idMovie] = crediResponse.cast;
+    return crediResponse.cast;
   }
 }

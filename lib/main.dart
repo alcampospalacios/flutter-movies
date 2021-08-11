@@ -4,5 +4,5 @@ import 'package:flutter/material.dart';
 import 'package:films/src/app.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(AppState());
 }
