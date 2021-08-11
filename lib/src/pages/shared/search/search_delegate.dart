@@ -46,9 +46,10 @@ class MoviesSearchDelegate extends SearchDelegate {
     }
 
     final moviesProvider = Provider.of<MoviesProvider>(context, listen: false);
+    moviesProvider.getSuggestionByQuery(query);
 
-    return FutureBuilder(
-      future: moviesProvider.searchMovie(query),
+    return StreamBuilder(
+      stream: moviesProvider.suggestionStream,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (!snapshot.hasData) {
           return Container(
@@ -83,11 +84,10 @@ class _Movie extends StatelessWidget {
         leading: Hero(
           tag: movie.idHero!,
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(15.0),
+            borderRadius: BorderRadius.circular(10.0),
             child: FadeInImage(
               placeholder: AssetImage('assets/no-image.png'),
               image: NetworkImage(movie.getPoster()),
-              width: 50,
               fit: BoxFit.contain,
             ),
           ),

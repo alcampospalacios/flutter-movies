@@ -12,7 +12,7 @@ class HomePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Films'),
+        title: Text('Películas'),
         centerTitle: false,
         actions: <Widget>[
           IconButton(
@@ -33,6 +33,14 @@ class HomePage extends StatelessWidget {
               movies: moviesProvider.onDisplayPopular,
               title: 'Populares',
               onNextPage: moviesProvider.getPopular,
+            ),
+            SizedBox(
+              height: 5.0,
+            ),
+            HorizontalListWidget(
+              movies: moviesProvider.onDisplayUpComing,
+              title: 'Varias',
+              onNextPage: moviesProvider.getUpComing,
             )
           ],
         ),

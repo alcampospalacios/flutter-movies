@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'package:films/src/helpers/debouncer.dart';
 import 'package:films/src/models/credits_response.dart';
 import 'package:films/src/models/movie.dart';
 import 'package:films/src/models/now_playing_response.dart';
 import 'package:films/src/models/popular_response.dart';
 import 'package:films/src/models/search_response.dart';
+import 'package:films/src/models/up_coming_response.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
@@ -16,11 +18,46 @@ class MoviesProvider extends ChangeNotifier {
 
   List<Movie> onDisplayMovies = [];
   List<Movie> onDisplayPopular = [];
+  List<Movie> onDisplayUpComing = [];
+
   Map<int, List<Cast>> cast = {};
+  Map<String, List<Movie>> _searchResults = {};
+
+  // Stream to implement search debouncer
+  final debouncer = Debouncer(duration: Duration(milliseconds: 500));
+
+  final StreamController<List<Movie>> _suggestionStreamControler =
+      new StreamController.broadcast();
+
+  Stream<List<Movie>> get suggestionStream =>
+      this._suggestionStreamControler.stream;
+
+  void getSuggestionByQuery(String query) {
+    debouncer.value = '';
+
+    debouncer.onValue = (value) async {
+      if (this._searchResults.containsKey(value)) {
+        this._suggestionStreamControler.add(this._searchResults[value]!);
+      } else {
+        final results = await this.searchMovie(value);
+        this._suggestionStreamControler.add(results);
+        this._searchResults[value] = results;
+      }
+    };
+
+    final timer = Timer.periodic(Duration(milliseconds: 300), (_) {
+      debouncer.value = query;
+    });
+
+    Future.delayed(Duration(milliseconds: 301)).then((_) => timer.cancel());
+  }
+
+  // ****************************************************************************************************
 
   MoviesProvider() {
     this.getMoviesNowPlaying();
     this.getPopular();
+    this.getUpComing();
   }
 
   Future<String> _request(String endpoint, [int page = 1]) async {
@@ -49,6 +86,19 @@ class MoviesProvider extends ChangeNotifier {
     this.onDisplayPopular = [
       ...this.onDisplayPopular,
       ...popularResponse.results
+    ];
+    notifyListeners();
+  }
+
+  getUpComing() async {
+    this._page++;
+
+    final response = await this._request('3/movie/upcoming', this._page);
+    final upComingResponse = UpComingResponse.fromJson(response);
+
+    this.onDisplayUpComing = [
+      ...this.onDisplayUpComing,
+      ...upComingResponse.results
     ];
     notifyListeners();
   }
