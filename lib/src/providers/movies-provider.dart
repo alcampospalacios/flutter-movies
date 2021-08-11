@@ -3,6 +3,7 @@ import 'package:films/src/models/credits_response.dart';
 import 'package:films/src/models/movie.dart';
 import 'package:films/src/models/now_playing_response.dart';
 import 'package:films/src/models/popular_response.dart';
+import 'package:films/src/models/search_response.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
@@ -10,7 +11,7 @@ class MoviesProvider extends ChangeNotifier {
   // // request data
   String _apiKey = 'f222162fa537c6b651ecfc1f02a53e2d';
   String _url = 'api.themoviedb.org';
-  String _languaje = 'es-ES';
+  String _language = 'es-ES';
   int _page = 0;
 
   List<Movie> onDisplayMovies = [];
@@ -24,7 +25,7 @@ class MoviesProvider extends ChangeNotifier {
 
   Future<String> _request(String endpoint, [int page = 1]) async {
     final url = Uri.https(_url, endpoint,
-        {'api_key': _apiKey, 'language': _languaje, 'page': '$page'});
+        {'api_key': _apiKey, 'language': _language, 'page': '$page'});
 
     // awaiting by the http response
     final response = await http.get(url);
@@ -60,5 +61,15 @@ class MoviesProvider extends ChangeNotifier {
 
     this.cast[idMovie] = crediResponse.cast;
     return crediResponse.cast;
+  }
+
+  Future<List<Movie>> searchMovie(String query) async {
+    final url = Uri.https(_url, '3/search/movie',
+        {'api_key': _apiKey, 'language': _language, 'query': query});
+
+    final response = await http.get(url);
+    final searchResponse = SearchResponse.fromJson(response.body);
+
+    return searchResponse.results;
   }
 }

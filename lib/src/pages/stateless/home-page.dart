@@ -1,3 +1,4 @@
+import 'package:films/src/pages/shared/search/search_delegate.dart';
 import 'package:films/src/providers/movies-provider.dart';
 import 'package:films/src/widgets/card-swiper-widget.dart';
 import 'package:films/src/widgets/horizontal-list-widget.dart';
@@ -14,7 +15,10 @@ class HomePage extends StatelessWidget {
         title: Text('Films'),
         centerTitle: false,
         actions: <Widget>[
-          IconButton(onPressed: () {}, icon: Icon(Icons.search))
+          IconButton(
+              onPressed: () => showSearch(
+                  context: context, delegate: MoviesSearchDelegate()),
+              icon: Icon(Icons.search))
         ],
       ),
       resizeToAvoidBottomInset: false,
