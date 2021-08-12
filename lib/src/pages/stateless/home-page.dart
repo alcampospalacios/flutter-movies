@@ -12,7 +12,7 @@ class HomePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Películas'),
+        title: Text('Cinéfilos'),
         centerTitle: false,
         actions: <Widget>[
           IconButton(
